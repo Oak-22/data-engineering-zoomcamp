@@ -1,21 +1,19 @@
-{{
-    config(
-        materialized='view'
-    )
-}}
+{{ config(materialized='view') }}   -- or 'table', depending on your preference
 
-with tripdata as 
-(
-  select *,
-    row_number() over(partition by vendorid, lpep_pickup_datetime) as rn
-  from {{ source('staging','green_tripdata') }}
-  where vendorid is not null 
+WITH tripdata AS (
+    SELECT
+        *,
+        -- partition by vendorid & pickup time to detect duplicates
+        row_number() OVER (PARTITION BY vendorid, lpep_pickup_datetime) AS rn
+    FROM {{ source('staging','gellow_tripdata') }}
+    WHERE vendorid IS NOT NULL
 )
-select
-    -- identifiers
+
+-- Removed the initial safe_cast for ratecodeid and keep only the case statement version
+SELECT
+    -- surrogate key from vendorid + pickup time
     {{ dbt_utils.generate_surrogate_key(['vendorid', 'lpep_pickup_datetime']) }} as tripid,
     {{ dbt.safe_cast("vendorid", api.Column.translate_type("integer")) }} as vendorid,
-    {{ dbt.safe_cast("ratecodeid", api.Column.translate_type("integer")) }} as ratecodeid,
     {{ dbt.safe_cast("pulocationid", api.Column.translate_type("integer")) }} as pickup_locationid,
     {{ dbt.safe_cast("dolocationid", api.Column.translate_type("integer")) }} as dropoff_locationid,
     
@@ -40,8 +38,25 @@ select
     cast(total_amount as numeric) as total_amount,
     cast({{ dbt.safe_cast("payment_type", "integer") }} as payment_type),
     {{ get_payment_type_description("payment_type") }} as payment_type_description
-from tripdata
-where rn = 1
+
+    -- Ratecode ID handling
+    CASE
+      WHEN ratecodeid IN ('1','2','3','4','5','6','7','8','9') THEN ratecodeid::INT
+      ELSE NULL
+    END AS ratecodeid,
+    CASE 
+      WHEN payment_type = 1 THEN 'Credit card'
+      WHEN payment_type = 2 THEN 'Cash'
+      WHEN payment_type = 3 THEN 'No charge'
+      WHEN payment_type = 4 THEN 'Dispute'
+      WHEN payment_type = 5 THEN 'Unknown'
+      WHEN payment_type = 6 THEN 'Void trip'
+      ELSE 'Other'
+    END AS payment_type_description,
+    {{ get_payment_type_description('payment_type') }} AS payment_type_description
+
+FROM tripdata
+WHERE rn = 1
 
 
 -- dbt build --select <model_name> --vars '{'is_test_run': 'false'}'
