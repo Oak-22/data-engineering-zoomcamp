@@ -16,6 +16,7 @@ SELECT
     {{ dbt.safe_cast("vendorid", api.Column.translate_type("integer")) }} AS vendorid,
     -- Safe casting for other fields
     {{ dbt.safe_cast("pulocationid", api.Column.translate_type("integer")) }} AS pickup_locationid,
+    {{ dbt.safe_cast("dolocationid", api.Column.translate_type("integer")) }} as dropoff_locationid,
     CAST(tpep_pickup_datetime AS timestamp) AS pickup_datetime,
     CAST(tpep_dropoff_datetime AS timestamp) AS dropoff_datetime,
     store_and_fwd_flag,
@@ -35,6 +36,7 @@ SELECT
       WHEN ratecodeid IN ('1','2','3','4','5','6','7','8','9') THEN ratecodeid::INT
       ELSE NULL
     END AS ratecodeid,
+    cast({{ dbt.safe_cast("payment_type", api.Column.translate_type("integer")}}) as payment_type,
     {{ get_payment_type_description('payment_type') }} AS payment_type_description
 FROM tripdata
 WHERE rn = 1
