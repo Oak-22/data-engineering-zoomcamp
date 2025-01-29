@@ -11,12 +11,12 @@ WITH tripdata AS (
 
 SELECT
     -- surrogate key from vendorid + pickup time
-    {{ dbt_utils.generate_surrogate_key(['vendorid', 'lpep_pickup_datetime']) }} as tripid,
-    {{ dbt.safe_cast("vendorid", api.Column.translate_type("integer")) }} as vendorid,
+    {{ dbt_utils.generate_surrogate_key(['vendorid', 'lpep_pickup_datetime']) }} AS tripid,
+    {{ dbt.safe_cast("vendorid", api.Column.translate_type("integer")) }} AS vendorid,
     
     -- timestamps
-    cast(lpep_pickup_datetime as timestamp) as pickup_datetime,
-    cast(lpep_dropoff_datetime as timestamp) as dropoff_datetime,
+    CAST(lpep_pickup_datetime AS timestamp) AS pickup_datetime,
+    CAST(lpep_dropoff_datetime AS timestamp) AS dropoff_datetime,
     
     -- trip info
     store_and_fwd_flag,
@@ -25,14 +25,14 @@ SELECT
     {{ dbt.safe_cast("trip_type", api.Column.translate_type("integer")) }} as trip_type,
 
     -- payment info
-    cast(fare_amount as numeric) as fare_amount,
-    cast(extra as numeric) as extra,
-    cast(mta_tax as numeric) as mta_tax,
-    cast(tip_amount as numeric) as tip_amount,
-    cast(tolls_amount as numeric) as tolls_amount,
-    cast(ehail_fee as numeric) as ehail_fee,
-    cast(improvement_surcharge as numeric) as improvement_surcharge,
-    cast(total_amount as numeric) as total_amount,
+    CAST(fare_amount as numeric) as fare_amount,
+    CAST(extra as numeric) as extra,
+    CAST(mta_tax as numeric) as mta_tax,
+    CAST(tip_amount as numeric) as tip_amount,
+    CAST(tolls_amount as numeric) as tolls_amount,
+    CAST(ehail_fee as numeric) as ehail_fee,
+    CAST(improvement_surcharge as numeric) as improvement_surcharge,
+    CAST(total_amount as numeric) as total_amount,
     {{ dbt.safe_cast("payment_type", api.Column.translate_type("integer")) }} as payment_type,
 
     -- Ratecode ID handling
