@@ -34,7 +34,7 @@ SELECT
     CAST(0 AS numeric) AS ehail_fee,
     CAST(improvement_surcharge AS numeric) AS improvement_surcharge,
     CAST(total_amount AS numeric) AS total_amount,
-    CAST({{ dbt.safe_cast("payment_type", "integer") }} as payment_type),
+    {{ dbt.safe_cast("payment_type", api.Column.translate_type("integer")) }} as payment_type,
 
 
     -- Ratecode ID handling
