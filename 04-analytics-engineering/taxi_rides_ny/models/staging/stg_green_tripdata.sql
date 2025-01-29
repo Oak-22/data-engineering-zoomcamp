@@ -5,7 +5,7 @@ WITH tripdata AS (
         *,
         -- partition by vendorid & pickup time to detect duplicates
         row_number() OVER (PARTITION BY vendorid, lpep_pickup_datetime) AS rn
-    FROM {{ source('staging','gellow_tripdata') }}
+    FROM {{ source('staging','green_tripdata') }}
     WHERE vendorid IS NOT NULL
 )
 
