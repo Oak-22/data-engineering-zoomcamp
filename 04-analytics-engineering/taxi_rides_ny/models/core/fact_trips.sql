@@ -25,7 +25,7 @@ with green_tripdata as (
         total_amount,
         payment_type_description,
         trip_type,
-        congestion_surcharge
+        congestion_surcharge,
         'Green' as service_type
     from {{ ref('stg_green_tripdata') }}
 ), 
@@ -44,15 +44,14 @@ yellow_tripdata as (
         payment_type_description,
         fare_amount,
         extra,
+        mta_tax,
         tip_amount,
         tolls_amount,
         improvement_surcharge,
         total_amount,
-        improvement_surcharge,
-        total_amount,
         congestion_surcharge,
         CAST(NULL AS NUMERIC) as ehail_fee,  -- Added to match green_tripdata
-        CAST(NULL AS INTEGER) as trip_type  -- Added to match green_tripdata
+        CAST(NULL AS INTEGER) as trip_type, -- Added to match green_tripdata
         'Yellow' as service_type
     from {{ ref('stg_yellow_tripdata') }}
 ), 
@@ -89,7 +88,6 @@ select trips_unioned.tripid,
     trips_unioned.ehail_fee, 
     trips_unioned.improvement_surcharge, 
     trips_unioned.total_amount, 
-    trips_unioned.payment_type, 
     trips_unioned.payment_type_description
 from trips_unioned
 inner join dim_zones as pickup_zone
