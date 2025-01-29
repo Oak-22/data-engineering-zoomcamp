@@ -21,7 +21,7 @@ SELECT
     -- trip info
     store_and_fwd_flag,
     {{ dbt.safe_cast("passenger_count", api.Column.translate_type("integer")) }} as passenger_count,
-    cast(trip_distance as numeric) as trip_distance,
+    CAST(trip_distance AS numeric) AS trip_distance,
     {{ dbt.safe_cast("trip_type", api.Column.translate_type("integer")) }} as trip_type,
 
     -- payment info
@@ -36,7 +36,7 @@ SELECT
     {{ dbt.safe_cast("payment_type", api.Column.translate_type("integer")) }} as payment_type,
 
     -- Ratecode ID handling
-    CASE
+    CASE 
       WHEN ratecodeid IN ('1','2','3','4','5','6','7','8','9') THEN ratecodeid::INT
       ELSE NULL
     END AS ratecodeid,

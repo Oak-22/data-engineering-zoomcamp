@@ -3,14 +3,53 @@
         materialized='table'
     )
 }}
-
 with green_tripdata as (
-    select *, 
+    select 
+        tripid,
+        vendorid,
+        pickup_locationid,
+        dropoff_locationid,
+        pickup_datetime,
+        dropoff_datetime,
+        store_and_fwd_flag,
+        passenger_count,
+        trip_distance,
+        fare_amount,
+        extra,
+        mta_tax,
+        tip_amount,
+        tolls_amount,
+        ehail_fee,
+        improvement_surcharge,
+        total_amount,
+        payment_type,
+        payment_type_description,
+        trip_type,
         'Green' as service_type
     from {{ ref('stg_green_tripdata') }}
 ), 
 yellow_tripdata as (
-    select *, 
+    select 
+        tripid,
+        vendorid,
+        pickup_locationid,
+        dropoff_locationid,
+        pickup_datetime,
+        dropoff_datetime,
+        store_and_fwd_flag,
+        passenger_count,
+        trip_distance,
+        fare_amount,
+        extra,
+        mta_tax,
+        tip_amount,
+        tolls_amount,
+        CAST(NULL AS NUMERIC) as ehail_fee,  -- Added to match green_tripdata
+        improvement_surcharge,
+        total_amount,
+        payment_type,
+        payment_type_description,
+        CAST(NULL AS INTEGER) as trip_type,  -- Added to match green_tripdata
         'Yellow' as service_type
     from {{ ref('stg_yellow_tripdata') }}
 ), 
