@@ -13,9 +13,7 @@ SELECT
     -- surrogate key from vendorid + pickup time
     {{ dbt_utils.generate_surrogate_key(['vendorid', 'tpep_pickup_datetime']) }} AS tripid,
     {{ dbt.safe_cast("vendorid", api.Column.translate_type("integer")) }} AS vendorid,
-    {{ dbt.safe_cast("pulocationid", api.Column.translate_type("integer")) }} AS pickup_locationid,
-    {{ dbt.safe_cast("dolocationid", api.Column.translate_type("integer")) }} AS dropoff_locationid,
-
+    
     -- timestamps
     CAST(tpep_pickup_datetime AS timestamp) AS pickup_datetime,
     CAST(tpep_dropoff_datetime AS timestamp) AS dropoff_datetime,
@@ -43,12 +41,17 @@ SELECT
       ELSE NULL
     END AS ratecodeid,
 
+        -- Pickup location handling
+    CASE
+      WHEN pulocationid ~ '^\d+$' THEN pulocationid::INT
+      ELSE NULL
+    END AS pickup_locationid,
+
     -- Dropoff location handling
     CASE
       WHEN dolocationid ~ '^\d+$' THEN dolocationid::INT
       ELSE NULL 
-    END AS dolocationid,
-
+    END AS dropoff_locationid,
 
     
     -- Using the macro 'get_payment_type)description.sql' to set the payment type description
