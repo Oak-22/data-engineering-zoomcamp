@@ -9,7 +9,6 @@ WITH tripdata AS (
     WHERE vendorid IS NOT NULL
 )
 
--- Removed the initial safe_cast for ratecodeid and keep only the case statement version
 SELECT
     -- surrogate key from vendorid + pickup time
     {{ dbt_utils.generate_surrogate_key(['vendorid', 'tpep_pickup_datetime']) }} AS tripid,
@@ -43,6 +42,14 @@ SELECT
       WHEN ratecodeid IN ('1','2','3','4','5','6','7','8','9') THEN ratecodeid::INT
       ELSE NULL
     END AS ratecodeid,
+
+    -- Dropoff location handling
+    CASE
+      WHEN dolocationid ~ '^\d+$' THEN dolocationid::INT
+      ELSE NULL 
+    END AS dolocationid,
+
+    
     
     -- Using the macro 'get_payment_type)description.sql' to set the payment type description
     {{ get_payment_type_description('payment_type') }} AS payment_type_description
