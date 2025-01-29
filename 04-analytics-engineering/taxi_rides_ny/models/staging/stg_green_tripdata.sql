@@ -44,15 +44,8 @@ SELECT
       WHEN ratecodeid IN ('1','2','3','4','5','6','7','8','9') THEN ratecodeid::INT
       ELSE NULL
     END AS ratecodeid,
-    CASE 
-      WHEN payment_type = 1 THEN 'Credit card'
-      WHEN payment_type = 2 THEN 'Cash'
-      WHEN payment_type = 3 THEN 'No charge'
-      WHEN payment_type = 4 THEN 'Dispute'
-      WHEN payment_type = 5 THEN 'Unknown'
-      WHEN payment_type = 6 THEN 'Void trip'
-      ELSE 'Other'
-    END AS payment_type_description,
+
+    -- Using the macro 'get_payment_type)description.sql' to set the payment type description
     {{ get_payment_type_description('payment_type') }} AS payment_type_description
 
 FROM tripdata
