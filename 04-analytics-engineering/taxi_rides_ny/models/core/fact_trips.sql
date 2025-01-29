@@ -56,9 +56,55 @@ yellow_tripdata as (
     from {{ ref('stg_yellow_tripdata') }}
 ), 
 trips_unioned as (
-    select * from green_tripdata
+    select 
+        tripid,
+        vendorid,
+        pickup_datetime,
+        dropoff_datetime,
+        store_and_fwd_flag,
+        ratecodeid,
+        pickup_locationid,
+        dropoff_locationid,
+        passenger_count,
+        trip_distance,
+        fare_amount,
+        extra,
+        mta_tax,
+        tip_amount,
+        tolls_amount,
+        ehail_fee,
+        improvement_surcharge,
+        total_amount,
+        payment_type_description,
+        trip_type,
+        congestion_surcharge,
+        service_type
+    from green_tripdata
     union all 
-    select * from yellow_tripdata
+    select 
+        tripid,
+        vendorid,
+        pickup_datetime,
+        dropoff_datetime,
+        store_and_fwd_flag,
+        ratecodeid,
+        pickup_locationid,
+        dropoff_locationid,
+        passenger_count,
+        trip_distance,
+        fare_amount,
+        extra,
+        mta_tax,
+        tip_amount,
+        tolls_amount,
+        ehail_fee,
+        improvement_surcharge,
+        total_amount,
+        payment_type_description,
+        trip_type,
+        congestion_surcharge,
+        service_type
+    from yellow_tripdata
 ), 
 dim_zones as (
     select * from {{ ref('dim_zones') }}
