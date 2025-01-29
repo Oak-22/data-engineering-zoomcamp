@@ -49,7 +49,7 @@ SELECT
       ELSE NULL 
     END AS dolocationid,
 
-    
+
     
     -- Using the macro 'get_payment_type)description.sql' to set the payment type description
     {{ get_payment_type_description('payment_type') }} AS payment_type_description
