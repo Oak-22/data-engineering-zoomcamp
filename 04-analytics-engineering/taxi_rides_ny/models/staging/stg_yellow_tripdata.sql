@@ -35,6 +35,8 @@ SELECT
     CAST(0 AS numeric) AS ehail_fee,
     CAST(improvement_surcharge AS numeric) AS improvement_surcharge,
     CAST(total_amount AS numeric) AS total_amount,
+    CAST({{ dbt.safe_cast("payment_type", "integer") }} as payment_type),
+
 
     -- Ratecode ID handling
     CASE
@@ -51,6 +53,6 @@ WHERE rn = 1
 -- dbt build --select <model_name> --vars '{'is_test_run': 'false'}'
 {% if var('is_test_run', default=true) %}
 
-  limit 100
+limit 100
 
 {% endif %}

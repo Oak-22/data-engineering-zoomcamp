@@ -37,7 +37,6 @@ SELECT
     cast(improvement_surcharge as numeric) as improvement_surcharge,
     cast(total_amount as numeric) as total_amount,
     cast({{ dbt.safe_cast("payment_type", "integer") }} as payment_type),
-    {{ get_payment_type_description("payment_type") }} as payment_type_description
 
     -- Ratecode ID handling
     CASE
@@ -46,7 +45,7 @@ SELECT
     END AS ratecodeid,
 
     -- Using the macro 'get_payment_type)description.sql' to set the payment type description
-    {{ get_payment_type_description('payment_type') }} AS payment_type_description
+    {{ get_payment_type_description("payment_type") }} AS payment_type_description
 
 FROM tripdata
 WHERE rn = 1
@@ -55,6 +54,6 @@ WHERE rn = 1
 -- dbt build --select <model_name> --vars '{'is_test_run': 'false'}'
 {% if var('is_test_run', default=true) %}
 
-  limit 100
+limit 100
 
 {% endif %}
