@@ -1,4 +1,4 @@
-{{ config(materialized='table') }}   -- or 'view', depending on your preference
+{{ config(materialized='view') }}   -- or 'table', depending on your preference
 
 WITH tripdata AS (
     SELECT
@@ -20,11 +20,6 @@ SELECT
     -- If PULocationID might also contain bad values, you can do a CASE
     {{ dbt.safe_cast("pulocationid", api.Column.translate_type("integer")) }} AS pickup_locationid,
 
-    -- Example for doLocationID: check if numeric, else set NULL
-    CASE
-        WHEN dolocationid ~ '^[0-9]+$' THEN dolocationid::INT
-        ELSE NULL
-    END AS dropoff_locationid,
 
     -- Timestamps
     CAST(tpep_pickup_datetime AS timestamp) AS pickup_datetime,
@@ -46,14 +41,23 @@ SELECT
     CAST(improvement_surcharge AS numeric) AS improvement_surcharge,
     CAST(total_amount AS numeric) AS total_amount,
 
-    -- Payment type: if not in 1..6, set it to NULL, then coalesce to 0 if you prefer
-    COALESCE(
-      CASE
-        WHEN payment_type IN ('1','2','3','4','5','6') THEN payment_type::int
-        ELSE NULL
-      END,
-      0
-    ) AS payment_type,
+    -- Example for doLocationID: check if numeric, else set NULL
+    CASE
+      WHEN dolocationid ~ '^[0-9]+$' THEN dolocationid::INT
+      ELSE NULL
+    END AS dropoff_locationid,
+
+    -- Payment type: if not in 1..6, set it to NULL
+    CASE
+      WHEN payment_type IN ('1','2','3','4','5','6') THEN payment_type::int
+      ELSE NULL
+    END AS payment_type,
+
+    -- Ratecode ID: if not in 1..9, set it to NULL
+    CASE
+      WHEN ratecodeid IN ('1','2','3','4','5','6') THEN ratecodeid::INT
+      ELSE NULL
+    END AS ratecodeid,
 
     {{ get_payment_type_description('payment_type') }} AS payment_type_description
 
